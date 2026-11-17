@@ -8,51 +8,47 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ios-build-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build-ios:
     runs-on: macos-latest
     timeout-minutes: 60
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-    - name: Set up Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        channel: stable
-        cache: true
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
 
-    - name: Show tool versions
-      run: |
-        flutter --version
-        xcodebuild -version
+      - name: Show tool versions
+        run: |
+          flutter --version
+          xcodebuild -version
 
-    - name: Get dependencies
-      run: flutter pub get
+      - name: Get dependencies
+        run: flutter pub get
 
-    - name: Run tests
-      run: flutter test
+      - name: Run tests
+        run: flutter test
 
-    - name: Build iOS app without signing
-      run: flutter build ios --release --no-codesign
+      - name: Build iOS app without signing
+        run: flutter build ios --release --no-codesign
 
-    - name: Package unsigned IPA
-      run: |
-        test -d build/ios/iphoneos/Runner.app
-        rm -rf Payload Iraqi-Sweets-unsigned.ipa
-        mkdir -p Payload
-        cp -R build/ios/iphoneos/Runner.app Payload/Runner.app
-        /usr/bin/zip -qry Iraqi-Sweets-unsigned.ipa Payload
-        file Iraqi-Sweets-unsigned.ipa
+      - name: Package unsigned IPA
+        run: |
+          test -d build/ios/iphoneos/Runner.app
+          rm -rf Payload Iraqi-Sweets-unsigned.ipa
+          mkdir -p Payload
+          cp -R build/ios/iphoneos/Runner.app Payload/Runner.app
+          /usr/bin/zip -qry Iraqi-Sweets-unsigned.ipa Payload
+          file Iraqi-Sweets-unsigned.ipa
 
-    - name: Upload unsigned IPA artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Iraqi-Sweets-unsigned-IPA
-        path: Iraqi-Sweets-unsigned.ipa
-        if-no-files-found: error
-        retention-days: 14
+      - name: Upload unsigned IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Iraqi-Sweets-unsigned-IPA
+          path: Iraqi-Sweets-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 14
